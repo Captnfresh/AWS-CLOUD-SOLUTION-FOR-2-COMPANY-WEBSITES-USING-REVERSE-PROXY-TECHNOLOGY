@@ -65,14 +65,21 @@ Before you begin, make sure the following requirements are met to set up your AW
 
 6. Log In to the DevOps Account:
    * Go to the AWS Sign-In page.
+   * Sign in as root email
    * Use the email address and password you provided during the DevOps account creation process.
+   * Click on Forget Password
+   * A link to create a new password would be sent to you.
+   * Now you're logged in your DevOps account that is in your Dev OU
 
-    
-    Use the email address and password you provided during the DevOps account creation process.
-    Once logged in, you can begin managing resources under this account.
+![image](https://github.com/user-attachments/assets/6e98cdb0-ea80-4e6f-a8f3-584106982b6a)
 
 
+7. Create a free domain name for your fictitious company using [Cloudns free domian hosting site](https://www.cloudns.net/main/)
+   * Signup and Login your account
 
+![image](https://github.com/user-attachments/assets/5d916b0f-87f1-47aa-ae7f-01ff565d64ca)
+
+   * Click on Dashboard > DNS hosting 
 
 
 
