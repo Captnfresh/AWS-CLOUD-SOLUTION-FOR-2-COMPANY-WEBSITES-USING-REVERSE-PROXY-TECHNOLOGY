@@ -79,7 +79,27 @@ Before you begin, make sure the following requirements are met to set up your AW
 
 ![image](https://github.com/user-attachments/assets/5d916b0f-87f1-47aa-ae7f-01ff565d64ca)
 
-   * Click on Dashboard > DNS hosting 
+   * Click on Dashboard > DNS hosting and follow the steps on the image below
+
+![image](https://github.com/user-attachments/assets/de505922-119a-499c-842f-eaad84a68d34)
+
+![image](https://github.com/user-attachments/assets/b1aa9abc-cfc1-4c3b-9a92-041e901b1bd0)
+
+
+8. Create a hosted zone in AWS, and map it to your free domain using [Cloudns free domian hosting site](https://www.cloudns.net/main/).
+   * From your Management console in AWS, type Route 53 in the search bar and select Route 53 from the results.
+   * In the Route 53 dashboard, click on Hosted zones in the left-hand navigation pane.
+   * Click Create hosted zone Fill in the following details:
+     - Domain name: Enter your Freenom domain name (for example,  adebowaletest.ip-ddns.com).
+     - Comment: Optional.
+     - Type: Select Public hosted zone.
+     - VPC: Leave this blank for a public hosted zone.
+     - Click Create hosted zone
+
+![image](https://github.com/user-attachments/assets/adcf0db6-444b-42d7-9814-f9aa9fc4a41d)
+
+
+
 
 
 
