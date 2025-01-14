@@ -98,10 +98,41 @@ Before you begin, make sure the following requirements are met to set up your AW
 
 ![image](https://github.com/user-attachments/assets/adcf0db6-444b-42d7-9814-f9aa9fc4a41d)
 
+![image](https://github.com/user-attachments/assets/af180ea9-3e5c-45b5-bad6-25d22d7cfcea)
+
+
+## SETUP A VIRTUAL PRIVATE NETWORK(VPC)
+
+Set Up a Virtual Private Network (VPC). Always make reference to the architectural diagram below and ensure that your configuration is aligned with it.
+
+![image](https://github.com/user-attachments/assets/9985cd95-6bb7-432d-b690-04da87499522)
+
+1. Create a VPC:
+   * Sign in to the AWS Management Console.
+   * Navigate to the VPC from the search bar.
+
+![image](https://github.com/user-attachments/assets/177a06b1-3cfe-4202-a5ab-22c7d9aedfb5)
+     
+   * Click on Your VPCs in the sidebar, then click Create VPC.
+   * Fill in the following details:
+     - Name Tag: Your_VPC_Name (e.g., adebowaletest)
+     - IPv4 CIDR block: 10.0.0.0/16 (or any range based on your architecture).
+  * Click Create VPC.
+
+![image](https://github.com/user-attachments/assets/077ac42f-c33b-4c3e-b125-ca461da5d608)
+
+![image](https://github.com/user-attachments/assets/30bce831-7163-4d69-a407-1a3dbcb8ed76)    
+    
+  * Enable DNS resolution and DNS hostnames from VPC settings.
+
+![image](https://github.com/user-attachments/assets/b9515bec-99a1-4760-bdd7-f40097986f74)
 
 
 
 
+
+    
+    
 
 
 
