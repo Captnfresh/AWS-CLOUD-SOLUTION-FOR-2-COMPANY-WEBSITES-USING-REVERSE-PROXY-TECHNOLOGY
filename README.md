@@ -117,15 +117,148 @@ Set Up a Virtual Private Network (VPC). Always make reference to the architectur
    * Fill in the following details:
      - Name Tag: Your_VPC_Name (e.g., adebowaletest)
      - IPv4 CIDR block: 10.0.0.0/16 (or any range based on your architecture).
-  * Click Create VPC.
 
 ![image](https://github.com/user-attachments/assets/077ac42f-c33b-4c3e-b125-ca461da5d608)
-
-![image](https://github.com/user-attachments/assets/30bce831-7163-4d69-a407-1a3dbcb8ed76)    
+ 
+  * Click Create VPC.
     
   * Enable DNS resolution and DNS hostnames from VPC settings.
 
+![image](https://github.com/user-attachments/assets/30bce831-7163-4d69-a407-1a3dbcb8ed76)    
+
+
 ![image](https://github.com/user-attachments/assets/b9515bec-99a1-4760-bdd7-f40097986f74)
+
+
+2. Create Subnets based on the architecture. Ensure proper segmentation for public and private subnets across availability zones (AZs).
+
+   * Public Subnet 1 (Availability Zone A):
+     - CIDR Block: 10.0.1.0/24
+     - Availability Zone: A
+     - Name: Public-Subnet-1
+       
+![image](https://github.com/user-attachments/assets/9f9c9bb2-50c8-4e04-97d8-07328745035b)
+
+![image](https://github.com/user-attachments/assets/f2c7f529-9ffe-4fd3-a130-6529afe02f1d)
+
+
+   * Private Subnet 1 (Availability Zone A):
+     - CIDR Block: 10.0.2.0/24
+     - Availability Zone: A
+     - Name: Private-Subnet-1
+       
+  ![image](https://github.com/user-attachments/assets/3713a31f-2976-4b85-827c-a157093b4991)
+
+  ![image](https://github.com/user-attachments/assets/2a35da3f-0eb6-44ee-b590-0187e785590d)
+  
+
+   * Public Subnet 2 (Availability Zone B):
+     - CIDR Block: 10.0.3.0/24
+     - Availability Zone: B
+     - Name: Public-Subnet-2
+
+![image](https://github.com/user-attachments/assets/296dfdf4-3551-42d6-a290-1aad2a187178)
+
+![image](https://github.com/user-attachments/assets/37d31861-55ef-422e-9191-26a61ad3f5bf)
+
+   * Private Subnet 2 (Availability Zone B):
+     - CIDR Block: 10.0.4.0/24
+     - Availability Zone: B
+     - Name: Private-Subnet-2
+
+![image](https://github.com/user-attachments/assets/bf306b7b-96e5-417e-821a-a83190a3cfb1)
+
+     
+   * Private Subnet 3 (Availability Zone A):
+     - CIDR Block: 10.0.5.0/24
+     - Availability Zone: A
+     - Name: Private-Subnet-3
+ 
+ ![image](https://github.com/user-attachments/assets/d9266c3a-8919-4cf5-a03a-c132ce7ff55c)
+    
+   * Private Subnet 4 (Availability Zone B):
+     - CIDR Block: 10.0.6.0/24
+     - Availability Zone: B
+     - Name: Private-Subnet-4
+
+![image](https://github.com/user-attachments/assets/593afb82-76e7-4a45-8d68-a71335eeb220)
+
+
+You should have them created and ready to go!
+![image](https://github.com/user-attachments/assets/1054da25-bc53-4d9e-b3aa-02bf4659d573)
+
+
+3. Create Route Tables:
+   
+   * Public Route Table:
+     - Navigate to Route Tables.
+     - Create a new route table and name it `Public-Route-Table`.
+     - Associate Public-Subnet-1 and Public-Subnet-2.
+     - Edit routes to include an Internet Gateway (which would be created in Step 4).
+       
+![image](https://github.com/user-attachments/assets/83f43925-2172-4f24-ada8-8702e5e62ee1)
+
+![image](https://github.com/user-attachments/assets/4d6028bc-0aa0-4e38-8235-490bab1e9e38)
+
+
+
+
+   * Private Route Table:
+     - Create a new route table and name it `Private-Route-Table`.
+     - Associate Private-Subnet-1, Private-Subnet-2, Private-Subnet-3, and Private-Subnet-4.
+     - Do not add an Internet Gateway (because you do not want attackers to attack your private subnets).
+
+![image](https://github.com/user-attachments/assets/f83eb1b9-f0d8-4ead-a246-a99cfdf84415)
+
+
+![image](https://github.com/user-attachments/assets/a11accef-3a9f-4eea-83d2-c1bb255df889)
+
+
+4. Create an Internet Gateway (IGW):
+   * Go to Internet Gateways.
+   * Click Create Internet Gateway.
+   * Name: `Main-Internet-Gateway`.
+   * Attach the Internet Gateway to the VPC created earlier.
+
+![image](https://github.com/user-attachments/assets/15142c90-2087-47c1-938a-01d9a88fc2c8)
+
+![image](https://github.com/user-attachments/assets/4ab24bf4-38a2-4ae5-9a89-4800d3c992fa)
+
+![image](https://github.com/user-attachments/assets/1387c705-8bc0-46c9-8ca4-0a82be882b08)
+
+![image](https://github.com/user-attachments/assets/409c2e72-4bd8-4714-a6fa-9d5b86545be9)
+
+
+5. Edit Public Route Table to Enable Internet Access:
+   * Go to the Public-Route-Table.
+   * Add a route: Destination: 0.0.0.0/0
+   * Target: Internet Gateway (IGW)
+
+![image](https://github.com/user-attachments/assets/402e7da3-baa9-4729-8f24-5993b3064def)
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
