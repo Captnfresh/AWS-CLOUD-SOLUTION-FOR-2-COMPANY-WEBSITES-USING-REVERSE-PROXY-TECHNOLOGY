@@ -237,6 +237,97 @@ You should have them created and ready to go!
 ![image](https://github.com/user-attachments/assets/402e7da3-baa9-4729-8f24-5993b3064def)
 
 
+6. Create Elastic IPs:
+   * Navigate to Elastic IPs under EC2.
+   * Allocate 3 Elastic IPs:
+     - Assign one to the NAT Gateway.
+     - Reserve two for Bastion hosts.
+
+
+![image](https://github.com/user-attachments/assets/1a3bac2b-559f-402b-947e-eae785c98ab1)
+
+![image](https://github.com/user-attachments/assets/4faa8eaa-1773-483f-abc2-c5131215360c)
+
+
+
+7. Create NAT Gateway from VPC dashboard:
+   * Create a new NAT Gateway and assign it to Public-Subnet-1.
+   * Use one of the Elastic IPs allocated earlier.
+   * Edit the Private-Route-Table to add a route for 0.0.0.0/0 with target being NAT Gateway.
+
+![image](https://github.com/user-attachments/assets/d358520a-2ebc-4d4b-8517-12b9be47af47)
+
+![image](https://github.com/user-attachments/assets/0b0f36a1-6ee9-4b33-ae6c-ba66c9cb9fb2)
+
+![image](https://github.com/user-attachments/assets/4bf74dd4-2e3c-4296-83f3-b959bb295e06)
+
+![image](https://github.com/user-attachments/assets/8b6e34bc-34d3-44c0-a474-27a5b8d3d28f)
+
+## Quick on, What does a NAT-Gateway do to Private subnets?
+
+A NAT Gateway (Network Address Translation Gateway) enables instances in a private subnet to access the internet while keeping those instances hidden from direct internet access. Here's how it works:
+
+1. Outbound Internet Access: Instances in a private subnet, which don't have public IP addresses, cannot directly access the internet. The NAT Gateway allows these instances to initiate outbound traffic (such as downloading updates or accessing external services) by translating their private IP addresses to the NAT Gateway's public IP address.
+2. Security: The NAT Gateway ensures that the instances in the private subnet are not exposed to incoming traffic from the internet. It only allows outbound traffic initiated from within the subnet and returns responses to those requests.
+3. Internet Communication: When an instance in the private subnet sends a request to the internet, the NAT Gateway forwards the request to the internet using its own public IP address. When the response comes back, the NAT Gateway forwards it to the correct instance in the private subnet by mapping the traffic back to the instance's private IP address.
+
+In summary, a NAT Gateway provides secure, one-way internet access for instances in a private subnet, allowing them to reach the internet without exposing them to external traffic.
+
+
+
+8. Create Security Groups:
+   * Nginx Servers:
+     - Allow access only from an Application Load Balancer (ALB).
+     - Use a placeholder for now; update once ALB is configured.
+
+   * Bastion Servers:
+     - Allow SSH access only from your workstation.
+     - To get your IP: Run `curl www.canhazip.com`.
+
+   * Application Load Balancer:
+     - Allow access from the Internet (0.0.0.0/0).
+
+   * Web Servers:
+     - Allow access only from Nginx servers.
+     - Use a placeholder for now; update once Nginx servers are configured.
+
+   * Data Layer:
+     - RDS: Allow access only from Web Servers.
+     - EFS: Allow access from both Nginx and Web Servers.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
