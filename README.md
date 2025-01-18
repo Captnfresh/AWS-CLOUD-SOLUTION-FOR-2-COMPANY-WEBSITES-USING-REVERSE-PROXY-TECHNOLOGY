@@ -280,21 +280,35 @@ In summary, a NAT Gateway provides secure, one-way internet access for instances
      - Allow access only from an Application Load Balancer (ALB).
      - Use a placeholder for now; update once ALB is configured.
 
+![image](https://github.com/user-attachments/assets/765b38fe-c604-44b3-aaa9-be4701e1e9eb)
+
    * Bastion Servers:
      - Allow SSH access only from your workstation.
      - To get your IP: Run `curl www.canhazip.com`.
 
+![image](https://github.com/user-attachments/assets/3a1e05c2-7ce9-4514-9056-a373f825e1af)
+
+![image](https://github.com/user-attachments/assets/4d6e9656-0fd0-44fe-82bb-ac0978ad76f3)
+
+
    * Application Load Balancer:
      - Allow access from the Internet (0.0.0.0/0).
+
+![image](https://github.com/user-attachments/assets/6e04b732-97be-432d-ad92-e3165474e88a)
+
 
    * Web Servers:
      - Allow access only from Nginx servers.
      - Use a placeholder for now; update once Nginx servers are configured.
 
+![image](https://github.com/user-attachments/assets/104b480d-8da2-4270-8dda-0ba1bf26bf02)
+
+
    * Data Layer:
      - RDS: Allow access only from Web Servers.
      - EFS: Allow access from both Nginx and Web Servers.
 
+![image](https://github.com/user-attachments/assets/28714405-9564-4c03-874e-5c483bd46761)
 
 
 
