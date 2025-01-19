@@ -267,9 +267,9 @@ You should have them created and ready to go!
 
 A NAT Gateway (Network Address Translation Gateway) enables instances in a private subnet to access the internet while keeping those instances hidden from direct internet access. Here's how it works:
 
-1. Outbound Internet Access: Instances in a private subnet, which don't have public IP addresses, cannot directly access the internet. The NAT Gateway allows these instances to initiate outbound traffic (such as downloading updates or accessing external services) by translating their private IP addresses to the NAT Gateway's public IP address.
-2. Security: The NAT Gateway ensures that the instances in the private subnet are not exposed to incoming traffic from the internet. It only allows outbound traffic initiated from within the subnet and returns responses to those requests.
-3. Internet Communication: When an instance in the private subnet sends a request to the internet, the NAT Gateway forwards the request to the internet using its own public IP address. When the response comes back, the NAT Gateway forwards it to the correct instance in the private subnet by mapping the traffic back to the instance's private IP address.
+A. Outbound Internet Access: Instances in a private subnet, which don't have public IP addresses, cannot directly access the internet. The NAT Gateway allows these instances to initiate outbound traffic (such as downloading updates or accessing external services) by translating their private IP addresses to the NAT Gateway's public IP address.
+B. Security: The NAT Gateway ensures that the instances in the private subnet are not exposed to incoming traffic from the internet. It only allows outbound traffic initiated from within the subnet and returns responses to those requests.
+C. Internet Communication: When an instance in the private subnet sends a request to the internet, the NAT Gateway forwards the request to the internet using its own public IP address. When the response comes back, the NAT Gateway forwards it to the correct instance in the private subnet by mapping the traffic back to the instance's private IP address.
 
 In summary, a NAT Gateway provides secure, one-way internet access for instances in a private subnet, allowing them to reach the internet without exposing them to external traffic.
 
