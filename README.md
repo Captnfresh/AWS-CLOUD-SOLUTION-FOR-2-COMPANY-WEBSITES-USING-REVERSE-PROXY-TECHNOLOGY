@@ -379,14 +379,175 @@ ssh -i /path/to/key.pem ec2-user@<Public-IP-of-Instance>
 
 B. Install Required Software. Run the following commands on each instance to install the required packages:
 
+* ***Step 1: Update the System. Before installing the required software, ensure your system is updated:***
+
 ```
 sudo yum update -y
-sudo yum install -y python3 ntp net-tools vim wget telnet epel-release htop
-sudo systemctl enable ntpd
-sudo systemctl start ntpd
+```
+This updates all packages on the instance.
+
+![image](https://github.com/user-attachments/assets/828dc8c0-e4eb-4758-89af-ddb7401bac80)
+
+
+* ***Step 2: Install Python3. To install Python3:***
+
+```
+sudo yum install -y python3
 ```
 
-C. 
+![image](https://github.com/user-attachments/assets/56cfe559-3af0-4299-8173-55be421ddad5)
+
+
+Verification: Confirm installation with:
+
+```
+    python3 --version
+```
+
+![image](https://github.com/user-attachments/assets/d0af9eae-e9ab-44e0-8afc-f49ddf129594)
+
+
+* ***Step 3: Install Chrony (for NTP). CentOS 9 uses chrony for time synchronization instead of ntp. Install it by running:***
+
+```
+sudo yum install -y chrony
+```
+
+Start and Enable Chrony:
+
+```
+sudo systemctl start chronyd
+sudo systemctl enable chronyd
+```
+
+Verification: Confirm service is running with:
+
+```
+sudo systemctl status chronyd
+```
+
+Check time synchronization:
+
+```
+    chronyc tracking
+```
+
+![image](https://github.com/user-attachments/assets/3488e5f2-c4c9-44b9-9b75-a864cd13a799)
+
+
+* ***Step 4: Install Net-tools. Install the necessary network tools:***
+
+```
+sudo yum install -y net-tools
+```
+
+![image](https://github.com/user-attachments/assets/377f9951-237a-47d3-b7b9-bd9aa038e6b7)
+    
+Verification: Confirm installation with:
+
+```
+ifconfig
+```
+![image](https://github.com/user-attachments/assets/c749cfb5-38ef-4583-ad39-d5db069cb9a6)
+
+
+* ***Step 5: Install Vim. Install the Vim editor:***
+
+```
+sudo yum install -y vim
+```
+
+![image](https://github.com/user-attachments/assets/10763b17-7cd5-4018-9df3-72225d9ec403)
+
+    
+Verification: Confirm installation with:
+
+```
+    vim --version
+```
+
+![image](https://github.com/user-attachments/assets/ec6e27b9-34da-470f-97d2-8655240123df)
+
+
+* ***Step 6: Install Wget. Install Wget for downloading files from the web:***
+
+```
+sudo yum install -y wget
+```
+
+![image](https://github.com/user-attachments/assets/78d37f3c-47c3-443c-b0ec-33e5127a67bd)
+
+    
+Verification: Confirm installation with:
+
+```
+    wget --version
+```
+
+![image](https://github.com/user-attachments/assets/554dc75b-b103-4bd7-80a1-682fe76207b3)
+
+
+* ***Step 7: Install Telnet. Install Telnet to test network connectivity:***
+
+```
+sudo yum install -y telnet
+```
+
+![image](https://github.com/user-attachments/assets/77801cfa-d3ef-4ad3-8484-3cdf1f0bc1bf)
+
+Verification: Confirm installation with:
+
+```
+telnet
+```
+
+To test connectivity, use:
+
+```
+    telnet 8.8.8.8 53
+```
+
+![image](https://github.com/user-attachments/assets/42b0ef81-9f8c-4513-8103-4a9fb7b61a66)
+
+
+* ***Step 8: Install EPEL-release. The EPEL repository provides additional packages for CentOS. To install it:***
+
+```
+sudo yum install -y epel-release
+```
+
+![image](https://github.com/user-attachments/assets/b4d7cea4-344d-4c08-90ca-caad4f8c7291)
+  
+Verification: Confirm installation with:
+
+```
+    yum repolist
+```
+
+
+* ***Step 9: Install Htop. Install Htop for monitoring system performance:***
+
+```
+sudo yum install -y htop
+```
+
+![image](https://github.com/user-attachments/assets/2cbe193b-1b38-4856-b6c6-52afa0d3c598)
+    
+Verification: Confirm installation with:
+
+```
+    htop
+```
+
+![image](https://github.com/user-attachments/assets/492127e9-8747-41df-82a4-e9bc551e7db9)
+
+
+* ***Step 10: Troubleshooting. If you encounter issues like connection timeouts or failed installations:***
+
+    Check the instance's network settings, including security groups and route tables.
+    Ensure that there are no firewall rules blocking the connection.
+    If yum repositories are not reachable, ensure that the instance has internet access (e.g., correct routing, VPC internet gateway).
+    If any software doesn’t install due to missing dependencies or errors, check the output messages for clues, and consider enabling additional repositories (like EPEL). 
 
 
 
