@@ -367,9 +367,9 @@ Now, We proceed With **Compute Resources** You will need to set up and configure
    * epel-release
    * htop
 
-### Take the following steps to achieve the installation of the software above
+## Take the following steps to achieve the installation of the software above
 
-A. SSH into Instances: Use your key pair to SSH into each EC2 instance:- 
+### A. SSH into Instances: Use your key pair to SSH into each EC2 instance:- 
 
 ```
 ssh -i /path/to/key.pem ec2-user@<Public-IP-of-Instance>
@@ -377,7 +377,7 @@ ssh -i /path/to/key.pem ec2-user@<Public-IP-of-Instance>
 ```
 ![image](https://github.com/user-attachments/assets/720fe877-4cb5-4f73-ab22-245f653cbe07)
 
-B. Install Required Software. Run the following commands on each instance to install the required packages:
+### B. Install Required Software. Run the following commands on each instance to install the required packages:
 
 * ***Step 1: Update the System. Before installing the required software, ensure your system is updated:***
 
@@ -398,7 +398,7 @@ sudo yum install -y python3
 ![image](https://github.com/user-attachments/assets/56cfe559-3af0-4299-8173-55be421ddad5)
 
 
-Verification: Confirm installation with:
+- Verification: Confirm installation with:
 
 ```
     python3 --version
@@ -420,7 +420,7 @@ sudo systemctl start chronyd
 sudo systemctl enable chronyd
 ```
 
-Verification: Confirm service is running with:
+- Verification: Confirm service is running with:
 
 ```
 sudo systemctl status chronyd
@@ -443,7 +443,7 @@ sudo yum install -y net-tools
 
 ![image](https://github.com/user-attachments/assets/377f9951-237a-47d3-b7b9-bd9aa038e6b7)
     
-Verification: Confirm installation with:
+- Verification: Confirm installation with:
 
 ```
 ifconfig
@@ -460,7 +460,7 @@ sudo yum install -y vim
 ![image](https://github.com/user-attachments/assets/10763b17-7cd5-4018-9df3-72225d9ec403)
 
     
-Verification: Confirm installation with:
+- Verification: Confirm installation with:
 
 ```
     vim --version
@@ -478,7 +478,7 @@ sudo yum install -y wget
 ![image](https://github.com/user-attachments/assets/78d37f3c-47c3-443c-b0ec-33e5127a67bd)
 
     
-Verification: Confirm installation with:
+- Verification: Confirm installation with:
 
 ```
     wget --version
@@ -495,13 +495,13 @@ sudo yum install -y telnet
 
 ![image](https://github.com/user-attachments/assets/77801cfa-d3ef-4ad3-8484-3cdf1f0bc1bf)
 
-Verification: Confirm installation with:
+- Verification: Confirm installation with:
 
 ```
 telnet
 ```
 
-To test connectivity, use:
+- To test connectivity, use:
 
 ```
     telnet 8.8.8.8 53
@@ -518,7 +518,7 @@ sudo yum install -y epel-release
 
 ![image](https://github.com/user-attachments/assets/b4d7cea4-344d-4c08-90ca-caad4f8c7291)
   
-Verification: Confirm installation with:
+- Verification: Confirm installation with:
 
 ```
     yum repolist
@@ -533,7 +533,7 @@ sudo yum install -y htop
 
 ![image](https://github.com/user-attachments/assets/2cbe193b-1b38-4856-b6c6-52afa0d3c598)
     
-Verification: Confirm installation with:
+- Verification: Confirm installation with:
 
 ```
     htop
@@ -543,12 +543,43 @@ Verification: Confirm installation with:
 
 
 * ***Step 10: Troubleshooting. If you encounter issues like connection timeouts or failed installations:***
+    - Check the instance's network settings, including security groups and route tables.
+    - Ensure that there are no firewall rules blocking the connection.
+    - If yum repositories are not reachable, ensure that the instance has internet access (e.g., correct routing, VPC internet gateway).
+    - If any software doesn’t install due to missing dependencies or errors, check the output messages for clues, and consider enabling additional repositories (like EPEL). 
 
-    Check the instance's network settings, including security groups and route tables.
-    Ensure that there are no firewall rules blocking the connection.
-    If yum repositories are not reachable, ensure that the instance has internet access (e.g., correct routing, VPC internet gateway).
-    If any software doesn’t install due to missing dependencies or errors, check the output messages for clues, and consider enabling additional repositories (like EPEL). 
 
+
+### C. Create the AMI from the EC2 Instance
+
+* ***Follow these steps to create an AMI:***
+
+    - Log in to the AWS Management Console. Go to the EC2 Dashboard.   
+
+    - Locate the Instance to Create the AMI From.
+        - Navigate to Instances under the EC2 section.
+        - Select the EC2 instance you've set up (e.g., the one configured with Nginx and other dependencies).
+
+    - Initiate the AMI Creation Process.
+        Click on the Actions dropdown at the top.
+        Navigate to Image and templates > Create Image.
+![image](https://github.com/user-attachments/assets/f171747c-8b1a-486e-ac8d-7639f632caa3)
+
+
+    - Fill in the Image Details.
+        - Image Name: Enter a descriptive name for the AMI (e.g., Nginx-Server-AMI).
+        - Image Description: Provide a brief description (e.g., AMI of CentOS Stream 9 configured with Nginx and required dependencies).
+        - No Reboot: Leave unchecked unless you want the instance to remain running during the AMI creation (not recommended as it might result in an inconsistent image).
+
+    - Add Storage (Optional).
+        - Review or modify the storage settings for the AMI. Typically, the default settings are sufficient.
+
+    - Create the AMI.
+        Click Create Image.
+
+![image](https://github.com/user-attachments/assets/ec534c6a-2c1a-4637-9b07-9167291178e0)
+
+Once done, AWS will start creating the AMI. This process might take a few minutes, depending on the size of your instance.
 
 
 
