@@ -310,20 +310,83 @@ In summary, a NAT Gateway provides secure, one-way internet access for instances
 
 ![image](https://github.com/user-attachments/assets/28714405-9564-4c03-874e-5c483bd46761)
 
+## Setting up compute resources
+
+Now, We proceed With **Compute Resources** You will need to set up and configure compute resources inside your VPC. The recources related to compute are:
+
+1. EC2 Instances
+2. Launch Templates
+3. Target Groups
+4. Autoscaling Groups
+5. TLS Certificates
+6. Application Load Balancers (ALB)
 
 
+## Set Up Compute Resources for Nginx Provision EC2 Instances for Nginx
+
+1. Launch EC2 Instances: Create an EC2 Instance based on CentOS Amazon Machine Image (AMI) in any 2 Availability Zones (AZ) in any AWS Region (it is recommended to use the Region that is closest to your customers). Use EC2 instance of T2 family (e.g. t2.micro or similar)
+   
+   * Log in to AWS Console and navigate to the EC2 Dashboard.
+
+   * Click Launch Instances and configure the following:
+       - Name and Tags: Assign meaningful names (e.g., Nginx-Instance-1 and Nginx-Instance-2).
+![image](https://github.com/user-attachments/assets/866a8291-a56b-48aa-a767-9d50cc3c8aba)
+
+       - AMI: Select a CentOS AMI (e.g., "CentOS 7" from the AWS Marketplace).
+![image](https://github.com/user-attachments/assets/b970b61c-0456-4807-af16-78e7d1c09499)
+
+       - Instance Type: Use t2.micro or a similar instance type.
+![image](https://github.com/user-attachments/assets/26bf14dd-2b21-4db8-852f-38311e01106b)
+
+       - Key Pair: Choose your existing key pair or create a new one for SSH access.
+
+   * Configure Instance Network:
+       - VPC: Select your existing VPC.
+       - Subnet: Choose a subnet in one Availability Zone for the first instance and another subnet in a different Availability Zone for the second instance.
+       - Auto-assign Public IP: Enable this if you plan to SSH directly or require external access during setup.
+       - Security Group: Select your existing Security Group in the VPC.
+![image](https://github.com/user-attachments/assets/2e24f04b-b4fb-4108-92bb-c00b7beee339)
+
+   * Storage:
+       - Allocate at least 8 GB of root volume storage.
+       - For larger applications, consider adding extra storage volumes.
+         
+   * Review and Launch:
+       - Confirm the details and click Launch to provision the instances.
+![image](https://github.com/user-attachments/assets/0661c46c-b461-4f15-9bfa-d5994559691c)
+*Nginx instances 1 & 2 has been created.*
 
 
+2. Ensure that it has the following software installed:
+   * python
+   * ntp
+   * net-tools
+   * vim
+   * wget
+   * telnet
+   * epel-release
+   * htop
 
+### Take the following steps to achieve the installation of the software above
 
+A. SSH into Instances: Use your key pair to SSH into each EC2 instance:- 
 
+```
+ssh -i /path/to/key.pem ec2-user@<Public-IP-of-Instance>
 
+```
+![image](https://github.com/user-attachments/assets/720fe877-4cb5-4f73-ab22-245f653cbe07)
 
+B. Install Required Software. Run the following commands on each instance to install the required packages:
 
+```
+sudo yum update -y
+sudo yum install -y python3 ntp net-tools vim wget telnet epel-release htop
+sudo systemctl enable ntpd
+sudo systemctl start ntpd
+```
 
-
-
-
+C. 
 
 
 
