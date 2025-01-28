@@ -567,7 +567,7 @@ sudo yum install -y htop
 
 
     - Fill in the Image Details.
-        - Image Name: Enter a descriptive name for the AMI (e.g., Nginx-Server-AMI).
+        - Image Name: Enter a descriptive name for the AMI (e.g., `Nginx-Server-AMI`).
         - Image Description: Provide a brief description (e.g., AMI of CentOS Stream 9 configured with Nginx and required dependencies).
         - No Reboot: Leave unchecked unless you want the instance to remain running during the AMI creation (not recommended as it might result in an inconsistent image).
 
@@ -581,13 +581,43 @@ sudo yum install -y htop
 
 Once done, AWS will start creating the AMI. This process might take a few minutes, depending on the size of your instance.
 
+```
+The AMI you created earlier is based on the EC2 instance where you installed and configured the required dependencies, such as python, nginx, vim, telnet, and others.
+This AMI is essentially a snapshot of that instance, which allows you to reuse the pre-installed configuration and software without needing to set them up again on new instances.
+Why Use That AMI for the Launch Template?
+    - It saves time: No need to reinstall dependencies (nginx, etc.) manually.
+    - Ensures consistency: Every instance launched from this AMI will have the same setup.
+    - Simplifies automation: Pre-configured AMIs reduce the need for additional configurations in the User Data script.
+
+When creating the launch template for Nginx, use this AMI as the base image, so any instance launched with the template will already have the essential configurations in place. The User Data script in the template will handle specific tasks like starting and enabling Nginx.
+
+```
+---
+## Prepare launch template for Nginx 
+
+***Step 1: Create a Launch Template***
+
+1. Go to the AWS Console: Navigate to EC2 Dashboard > Launch Templates.
+
+2. Create a New Launch Template:
+    - Click Create Launch Template.
+    - Launch Template Name: Give it a name like `nginx-launch-template`.
+    - Template Version Description: Add something descriptive like `Template for Nginx instances with pre-installed dependencies`.
+
+![image](https://github.com/user-attachments/assets/493a5448-5587-446e-9d7d-9eb2b776828c)
+
+3. Select the AMI: Under Amazon Machine Image (AMI), search for and select the AMI you created earlier.
+
+![image](https://github.com/user-attachments/assets/673e5f0a-dd1d-435c-9a76-cb05f906e03d)
+
+
+4. Instance Type: Choose an appropriate instance type (e.g., t2.micro for testing or based on your workload).
 
 
 
+5. Key Pair: Select an existing key pair for SSH access, or leave it blank if you're using a bastion host for access.
 
-
-
-
+![image](https://github.com/user-attachments/assets/4c9dc7b9-87cf-4d7c-8049-f9031a2c3086)
 
 
 
