@@ -705,7 +705,22 @@ sudo systemctl status nginx
           - Scheme: Select Internet-facing.
           - Listeners: Ensure HTTP (port 80) and/or HTTPS (port 443) listeners are selected depending on your configuration.
 
+2. ***Obtain an SSL certificate***
+   * Navigate to AWS Certificate Manager (ACM): In the AWS Management Console, search for Certificate Manager.
 
+![image](https://github.com/user-attachments/assets/329cb560-b822-4645-be31-4e2c2dc5047f)
+
+   * Request a Public SSL Certificate:
+     - Click on Request a certificate.
+     - Select Request a public certificate and click Next.
+![image](https://github.com/user-attachments/assets/c7a85f3c-3980-4feb-be6e-c7a409be74c2)
+
+![image](https://github.com/user-attachments/assets/f7d1590c-929e-4e41-95c3-a6b55029c8ce)
+
+![image](https://github.com/user-attachments/assets/88f7db31-c4c2-4308-b27d-44941a9ae0fe)
+    
+![image](https://github.com/user-attachments/assets/d45fa1ea-e5e7-46d3-97e8-d8cd36116f54)
+    
 
 
 
