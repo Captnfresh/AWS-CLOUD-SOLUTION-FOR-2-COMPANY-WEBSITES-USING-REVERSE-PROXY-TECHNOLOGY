@@ -619,18 +619,91 @@ When creating the launch template for Nginx, use this AMI as the base image, so 
 
 ![image](https://github.com/user-attachments/assets/4c9dc7b9-87cf-4d7c-8049-f9031a2c3086)
 
+7. Finalize the Template:
+   * Review all configurations.
+   * Click **Create Launch Template**.
 
+8. Launch Nginx Instance in Public Subnet 2
+   * Go to EC2 Dashboard → Launch Templates.
+   * Select Nginx-Launch-Template.
+   * Click Actions → Launch Instance from Template.
 
+![image](https://github.com/user-attachments/assets/1362b848-aa5f-4bb9-8099-605d1d41b9aa)
 
+   * Configure Instance Details:
+     - Subnet: Select Public Subnet 2.
+     - Security Group: Ensure SSH (22), HTTP (80), and HTTPS (443) are allowed.   
+    
+   * Click "Launch Instance" and wait for it to initialize.  
+![image](https://github.com/user-attachments/assets/fee8f9af-d817-4c78-a5df-6f6e31d3b0eb)
 
+***Verify that the Instance from the Launch Template is Running and Accessible***    
 
+1. **Verify Instance is Running**
+   * Navigate to EC2 Dashboard:
+     - Go to the EC2 Dashboard in the AWS Management Console.
+     - Under Instances, check the Status of your instance created from the launch template. The status should be running.
+        
+![image](https://github.com/user-attachments/assets/0e70857b-6891-493d-95e7-3950bba5b9b1)
 
+2. **Verify Instance has a Public IP Address**
+   * In the EC2 Dashboard, select the instance.
+   * Look under the Public IPv4 address field.
+     - Ensure it has a public IP address assigned.
+     - If there is no IP assigned, you'll need to associate an Elastic IP with the instance.
+        
+3. **Verify Security Group Settings**
+   * Check the Security Group assigned to the instance:
+     - Make sure it has rules that allow inbound traffic on SSH (port 22), HTTP (port 80), and HTTPS (port 443).
+     - Confirm that the source IP for these rules is appropriate (e.g., 0.0.0.0/0 for public access or a specific IP range for restricted access).        
 
+![image](https://github.com/user-attachments/assets/19d9a98f-665e-48c7-9ea3-130444e03477)
 
+4. **Verify Nginx Installation**
+   - SSH into the instance:
 
+```
+ssh -i <your-key-pair.pem> ec2-user@<instance-public-ip>
+```
 
+  - Check Nginx status:
 
+```
+sudo systemctl status nginx
+```    
 
+5. **Verify Nginx is Accessible via HTTP**
+
+  - Locally (on the instance):
+        - Run `curl -I http://localhost` to confirm that the Nginx server is responding locally.
+        - You should see a 200 OK response.
+
+![image](https://github.com/user-attachments/assets/6d29d8fe-8137-4827-be58-3155cbb0340b)
+
+  - From a Browser:
+         - Open a web browser and type the public IP of your instance (e.g., http://<instance-public-ip>).
+         - You should see the Nginx welcome page if everything is set up correctly.
+
+![image](https://github.com/user-attachments/assets/8f306864-5c1a-40fc-80eb-5418b246efba)
+
+## Next step is to create a target group. We need to create an ALB first.
+
+1. ***Create the Load Balancer:***
+
+    * Go to the AWS Console:
+          - Navigate to EC2 Dashboard > Load Balancers.
+          - Choose Create Load Balancer.
+![image](https://github.com/user-attachments/assets/a2f4f97a-bc09-45bc-9b8f-b12d4a47787f)
+
+     * Choose the Load Balancer Type:
+          - You can choose between Application Load Balancer (ALB) or Network Load Balancer (NLB) based on your use case.
+          - Since you're handling HTTP/HTTPS traffic (Nginx), Application Load Balancer (ALB) should work well.
+![image](https://github.com/user-attachments/assets/928311ad-e0bd-47bc-93f8-6f29c5a1214a)
+
+     * Configure Load Balancer Settings:
+          - Name: Give the Load Balancer a descriptive name (e.g., Nginx-ALB).
+          - Scheme: Select Internet-facing.
+          - Listeners: Ensure HTTP (port 80) and/or HTTPS (port 443) listeners are selected depending on your configuration.
 
 
 
