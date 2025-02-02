@@ -722,25 +722,93 @@ sudo systemctl status nginx
 ![image](https://github.com/user-attachments/assets/d45fa1ea-e5e7-46d3-97e8-d8cd36116f54)
     
 
+3. ***Back to creating the ALB***
+   * **Here, you’ll need to set some basic settings:**
+     - Name: Give your ALB a name (e.g., Nginx-ALB).
+     - Scheme: Choose internet-facing if you want it to be accessible from the internet.
+     - IP Address Type: Choose ipv4.
+     - Listeners: Make sure you select the HTTPS listener for port 443 (because we’ll secure traffic using TLS).
+    
+*Kindly follow through with the images below*
+
+![image](https://github.com/user-attachments/assets/4f8c19f2-82ae-4316-b29b-225237a535db)
+
+![image](https://github.com/user-attachments/assets/0425f632-6e61-4f4b-99f9-e816403b3fb2)
+
+![image](https://github.com/user-attachments/assets/42232b32-f250-47a8-9025-6d72a6255ce2)
+
+![image](https://github.com/user-attachments/assets/b8275117-a865-447f-976f-83f950db2012)
 
 
+***Before we finally create the ALB, we would need to attach a target group. Follow through with the steps below***
+
+![image](https://github.com/user-attachments/assets/35da4810-52d4-4ce3-887d-b0e7da92285e)
+
+![image](https://github.com/user-attachments/assets/ee4ec4eb-88ee-47a9-a028-b04078324cf6)
+
+![image](https://github.com/user-attachments/assets/bcdde4f9-d843-4e2e-a5aa-28df0cd16b17)
+
+![image](https://github.com/user-attachments/assets/4e29d81f-0ed1-4287-bbf7-942dffc25fb3)
+
+![image](https://github.com/user-attachments/assets/dbbd336c-4c51-4a11-9ac1-16ed69ef0c12)
+
+***Now we have the passed the health check status for the target groups***
 
 
+## Now we Set-up the Auto-Scaling group for Nginx on EC2 with ALB
 
+***Step-by-Step Guide to Setting Up Auto Scaling for Nginx on AWS EC2 with Application Load Balancer***
 
+1. Configure Auto Scaling Group (ASG):
+        * Create an Auto Scaling Group with the launch template, public subnets, and desired capacity.
+        * Select the ALB as the load balancer.
+        * Attach your EC2 instances to the Auto Scaling Group.
+        * Enable health checks from both EC2 and ALB for better monitoring and fault tolerance.
+        * Set desired capacity to 2, minimum capacity to 2, and maximum capacity to 4.
+        * Configure scaling policies: Scale out when CPU utilization exceeds 90%.
+        * Optionally, disable scale-in to avoid shrinking your infrastructure in this setup.
 
+2. Set Up Scaling Policies:
+    * Target Tracking Scaling Policy:
+        - Configure a target tracking scaling policy based on the CPU Utilization metric, setting the target value to 90%.
+        - Enable scale-out to automatically increase the instance count when CPU usage reaches 90%. This ensures your infrastructure can scale dynamically.
+    * Disable Scale-In: Optionally, You can choose to disable the scale-in policy to ensure that only scaling out is triggered. This is useful in scenarios where you want to handle increased load without shrinking capacity. However, this is not compulsory.
 
+3. Create and Configure SNS Notifications:
+    * Create SNS Topic:
+        - Go to the SNS console and create a new Standard Topic.
+        - Name the topic (e.g., AutoScalingNotifications).
+        - Create a Subscription to the topic (e.g., via email) to receive notifications.
+    * Subscribe to SNS Topic:
+        - After creating the subscription, confirm it through the link sent to your email or other contact method.
+    * Configure SNS with Auto Scaling:
+        - In the Auto Scaling configuration, under Notification, choose Add Notification.
+        - Select your SNS Topic to send notifications related to scaling events (such as instance launch, terminate, etc.).
 
+5. Verify Configuration
+    * Monitor Auto Scaling:
+        - Check the Auto Scaling Group's Activity History for any scaling activities.
+        - Monitor the ALB to ensure healthy instances are serving traffic.
 
+### See the images below for step by step process:
 
+![image](https://github.com/user-attachments/assets/b4e37da0-a9c4-4563-ab5f-f7f6af4970a2)
 
+![image](https://github.com/user-attachments/assets/fd351f60-001a-455a-83ee-9a6cbb70a959)
 
+![image](https://github.com/user-attachments/assets/27dc2ed8-3bc4-4530-aec1-e83485da97e8)
 
+![image](https://github.com/user-attachments/assets/8bfbd206-1335-49dc-acb4-586c6e1a4181)
 
+![image](https://github.com/user-attachments/assets/9d070cd1-21f4-4819-88d2-edc656be3686)
 
+![image](https://github.com/user-attachments/assets/2525d066-a4e5-4872-bf4b-37ab11f21351)
 
+![image](https://github.com/user-attachments/assets/c6070f14-80c0-445d-a88c-bf3105b52dd5)
 
+![image](https://github.com/user-attachments/assets/d9cf27b1-93a5-4f1f-be83-47c11f739caa)
 
+![image](https://github.com/user-attachments/assets/6d41674a-f152-4433-ad5d-25f8e8bbab7a)
 
     
     
