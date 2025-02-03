@@ -811,11 +811,90 @@ sudo systemctl status nginx
 ![image](https://github.com/user-attachments/assets/6d41674a-f152-4433-ad5d-25f8e8bbab7a)
 
     
+## Now, We setup the compute resources for the bastion server
+
+***1. Provision the EC2 Instances for Bastion***
     
+**Step 1: Launch EC2 Instance**
+
+ 1. Go to AWS EC2 Console
+    Navigate to EC2 > Instances and click Launch Instance.
+
+2. Choose an Amazon Machine Image (AMI)
+        Select CentOS Amazon Machine Image (AMI).
+        Ensure it matches the Region and Availability Zone (AZ) where your Nginx server is located.
+
+3. Choose an Instance Type
+        Select an instance type such as t2.micro (if using free tier) or t3.small for better performance.
+
+4. Configure Instance Details
+        Number of Instances: 1 (repeat for another AZ)
+        Network: Select your VPC.
+        Subnet: Choose the public subnet in the same AZ as your Nginx server.
+        Auto-assign Public IP: Enable
+
+5. Add Storage
+        Root volume: Minimum 8 GB (Increase as needed).
+        Select General Purpose SSD (gp3).
+
+7. Configure Security Group
+        Allow SSH (22) access from a trusted IP or your organization's VPN.
+        (Optional) Restrict SSH to a specific CIDR range.
+
+8. Review and Launch
+        Select or create a key pair for SSH access.
+        Click Launch Instance.
+
+![image](https://github.com/user-attachments/assets/6c1bbc6c-f92b-4fc4-8636-f6db49a560cf)
+
+![image](https://github.com/user-attachments/assets/a8864197-b0c6-4050-873c-d6fe13db3553)
 
 
+**Step 2: Ensure that it has the following software installed**
+- python
+- ntp
+- net-tools
+- vim
+- wget
+- telnet
+- epel-release
+- htop
 
+1. Connect to the Bastion Host. Use SSH to connect to your Bastion EC2 Instance:
 
+```
+ssh -i your-key.pem ec2-user@<Bastion_Public_IP>
+```
+
+2. Update the System
+
+```
+sudo yum update -y
+```
+
+3. Install Required Packages. Run the following command to install all required software:
+
+```
+sudo yum install -y python3 ntp net-tools vim wget telnet epel-release htop
+```
+
+4. Start and Enable NTP
+
+```
+sudo systemctl start ntpd
+sudo systemctl enable ntpd
+```
+
+5. Verify Installations. Check if software is installed correctly:
+
+```
+python3 --version
+ntpq -p
+vim --version
+wget --version
+telnet --version
+htop --version
+```
 
 
 
