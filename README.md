@@ -896,6 +896,261 @@ telnet --version
 htop --version
 ```
 
+![image](https://github.com/user-attachments/assets/36cb6f6c-6eba-471d-b5af-ab8f6782518f)
+
+![image](https://github.com/user-attachments/assets/50db983b-a98e-4eb3-bc26-be6dab53af45)
+
+
+## Next up is to associate an Elastic IP with the Bastion EC2 Instances we previously created then create an AMI out of the Bastion EC2 instance.
+
+**Step 1: Associate an Elastic IP with Each Bastion EC2 Instance**
+
+1. Allocate an Elastic IP Address
+    - Open AWS Management Console and go to EC2 Dashboard.
+    - In the left panel, click on Elastic IPs under Network & Security.
+    - Click Allocate Elastic IP address.
+    - Choose Amazon’s pool of IPv4 addresses and click Allocate.
+    - Copy the allocated Elastic IP for later use.
+
+2. Associate the Elastic IP with a Bastion EC2 Instance.
+    - Still on the Elastic IPs page, select the IP address you just allocated.
+    - Click Actions → Associate Elastic IP address.
+    - Under Instance, select one of your Bastion EC2 Instances.
+    - Leave Private IP as default (or select the primary private IP).
+    - Click Associate.
+
+![image](https://github.com/user-attachments/assets/f3f4ebf1-dc21-40e2-8f02-2e4d8e19a731)
+
+
+***Step 2: Create an AMI from the Bastion EC2 Instance***
+
+1. Create the AMI.
+    - Open AWS Management Console and go to EC2 Dashboard.
+    - Click Instances on the left panel.
+    - Select your Bastion EC2 instance that you want to create an AMI from.
+    - Click Actions → Image and templates → Create Image.
+    - In the Create Image window:
+        * Image name: Give it a descriptive name (e.g., Bastion-AMI-v1).
+        * Image description: (Optional) Add details like OS type or purpose.
+        * No reboot: Keep it unchecked (unless you want to avoid downtime).
+    - Click Create Image.
+
+2. Verify AMI Creation.
+    - Go to EC2 Dashboard → Click AMIs under Images.
+    - Look for your newly created AMI (it will be in a Pending state at first).
+    - Once it changes to Available, your AMI is ready!
+
+![image](https://github.com/user-attachments/assets/30212b2c-b5c8-4ddf-ad3d-d38c475b2d84)
+
+
+***Step 3: Prepare Launch Template for Bastion (One per Subnet)***
+1. Create a Launch Template
+    - Open AWS Management Console → Go to EC2 Dashboard.
+    - On the left panel, click Launch Templates.
+    - Click Create launch template.
+    - Enter Template Name (e.g., `Bastion-Launch-Template-SubnetA`).
+    - Under Source template, select No template (since we're creating a new one).
+
+![image](https://github.com/user-attachments/assets/8a7bf41d-4c46-4a3a-8091-019bd3a629e1)
+
+2. Use the AMI You Created
+    - Under Amazon Machine Image (AMI), click Browse AMIs.
+    - Select the AMI you created earlier.
+
+![image](https://github.com/user-attachments/assets/55cafdd0-ef46-4628-8ae7-7645f6b20518)
+
+3. Configure Instance Settings
+    - Instance type: Select an instance type (e.g., t2.micro or as required).
+    - Key pair (login): Choose an existing key pair or create a new one.
+    - Network settings:
+        * VPC: Select your existing VPC.
+        * Subnet: Choose a Public Subnet (we need public access for Bastion).
+        * Auto-assign Public IP: Enabled (for external access).
+
+4. Assign Security Group
+    - Click Create a new security group (or choose an existing one).
+    - Add the following inbound rules:
+        * SSH (Port 22) → Source: Your trusted IP or Anywhere (0.0.0.0/0, ::/0). In this case, we would be allowing traffic from anywhere.
+
+5. Configure User Data (Automate Setup on Launch)
+    - Scroll down to Advanced details → Find User data section.
+    - Enter the following User Data script to update yum and install Ansible & Git:
+
+```
+#!/bin/bash
+# Update system packages
+sudo yum update -y
+
+# Install EPEL repository (required for Ansible)
+sudo yum install -y epel-release
+
+# Install Ansible and Git
+sudo yum install -y ansible git
+
+```
+   - Click Create launch template.
+
+![image](https://github.com/user-attachments/assets/796d3b37-3242-4c72-a485-95359171e082)
+
+6. Create a second instance from the launch template. You don’t necessarily need a second launch template if both Bastion instances will have the same configuration.
+
+**When to Use a Single Launch Template:**
+>✅ If both instances share the same AMI, instance type, security group, and user data, you can launch multiple instances from the same launch template, just selecting different subnets during launch.
+When a Second Launch Template is Needed:
+
+>❌ If each Bastion instance requires different configurations (e.g., different instance types, security settings, or user data), then creating separate launch templates makes sense.
+What You Can Do Instead of a Second Template:
+
+- Go to Launch Template → Actions → Launch Instance from Template.
+- Set the Number of Instances to 1.
+- Select different public subnets for each instance.
+
+7. Verify Installed Dependencies. Run the following commands inside the Bastion instance:
+
+- Check if git is installed:
+
+```
+git --version
+```
+
+- If installed, you should see output like:
+
+```
+git version 2.x.x
+```
+
+- Check if Ansible is installed:
+
+```
+ansible --version
+```
+
+- If installed, you should see output like:
+
+```
+ansible 2.x.x
+```
+
+- Check if yum update ran successfully:
+
+```
+sudo yum list updates
+```
+
+![image](https://github.com/user-attachments/assets/445a7437-b3c6-4a8a-a6a6-1d35ef45f888)
+
+>If there are no critical pending updates, it means the update command in User Data worked.
+>***Troubleshoot if Packages are Missing:***
+>If git or ansible is not installed, you can check the User Data execution logs:
+
+```
+sudo cat /var/log/cloud-init-output.log
+```
+>This log will show if there were any issues running the User Data script during instance launch.
+
+
+***Configure Target Groups***
+
+Step 1: Create a Target Group for Bastion Instances
+    - Open AWS Management Console → Go to EC2 Dashboard.
+    - On the left side, scroll down and click Target Groups under Load Balancing.
+    - Click Create target group.
+
+Step 2: Configure the Target Group
+    - Target type: Select Instances.
+    - Protocol: Select TCP.
+    - Port: Enter 22 (for SSH).
+    - VPC: Choose the VPC where your Bastion instances are located.
+    - Health checks:
+        * Set Protocol to TCP.
+        * Set Port to 22.
+        * For Health check path, leave it empty since it's TCP-based.
+
+Step 3: Register Bastion Instances as Targets
+    - After creating the target group, select it from the Target Groups list.
+    - Click Targets under the Description tab.
+    - Click Edit.
+    - Select the Bastion instances that were launched via the template (ensure they are in running state).
+    - Click Add to registered.
+
+Step 4: Verify Health Check
+    - After registering the targets, verify the health check status under the Target Group details.
+    - The health check should eventually pass for your Bastion instances. If it doesn’t, make sure the instances are properly configured to accept inbound SSH traffic on port 22 and that they are running.
+
+
+***Configure Autoscaling for Bastion***
+1. Select the Right Launch Template
+    - Go to EC2 Console > Auto Scaling Groups > Create Auto Scaling Group.
+    - For Launch Template, select the one you previously created for the Bastion EC2 instances.
+
+2. Select the VPC
+    - Choose the VPC where your Bastion instances are deployed.
+
+3. Select Both Public Subnets
+    - Choose the two public subnets in your VPC where you want your Bastion instances to be launched. These subnets should have public IPs to ensure external access.
+
+4. Enable Application Load Balancer for the Auto Scaling Group (ASG)
+    - In the Load Balancer section, enable Application Load Balancer (ALB) for the Auto Scaling group.
+    - Select the ALB you created earlier and ensure it’s attached.
+
+5. Select the Target Group You Created Earlier
+    - For Target Group, select the one you created earlier for the Bastion servers.
+
+6. Health Checks for Both EC2 and ALB
+    - Ensure you have both EC2 health check and ALB health check enabled. This way, your instances will be monitored for both instance health and load balancer health.
+
+7. Set Desired Capacity to 2
+    - Set the Desired Capacity to 2. This means you want two instances running by default.
+
+8. Set Minimum Capacity to 2
+    - Set the Minimum Capacity to 2, so that there will always be at least two instances running.
+
+9. Set Maximum Capacity to 4
+    - Set the Maximum Capacity to 4. This allows the Auto Scaling Group to scale up to four instances when needed.
+
+10. Set Scaling Policy (Scale out if CPU utilization reaches 90%)
+    - Set a Scaling Policy to scale out when CPU utilization reaches 90%. This ensures that additional instances will be launched when the load gets too high.
+
+11. Ensure an SNS Topic for Scaling Notifications
+    - Make sure you have an SNS topic to send scaling notifications when instances are launched or terminated due to scaling.
+        * If you don’t have an SNS topic, you can create one directly in the Auto Scaling setup process.
+
+**Step-by-Step Execution**
+    - Navigate to Auto Scaling Groups in the EC2 console.
+    - Click on Create Auto Scaling Group.
+    - Follow the steps listed above for selecting the Launch Template, VPC, Subnets, Load Balancer, and Target Group.
+    - Set the desired, minimum, and maximum capacities.
+    - Set the Scaling Policy to use CPU utilization of 90%.
+    - Add an SNS Topic for scaling notifications.
+
+Once everything is set up, the Auto Scaling Group will manage your Bastion instances automatically based on the load!
+
+## Setup Compute resources for Webservers
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
