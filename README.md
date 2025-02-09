@@ -1142,9 +1142,70 @@ Now, you will need to create 2 separate launch templates for both the WordPress 
   
 3. Create an AMI out of the Ec2 instance.
 
+***Steps Taken:***
+1. Set Up EC2 Instances in Private Subnets:
+   - Created 2 separate EC2 instances (CentOS) for WordPress and Tooling websites in 2 different Availability Zones within the same Region.
+   - Instances were placed in private subnets.
+   - Software Installation via User Data Script:
 
 
 
+2. For both instances, we used a User Data script to automate the installation of the required software packages, including:
+- python
+- ntp
+- net-tools
+- vim
+- wget
+- telnet
+- epel-release
+- htop
+- php
+
+3. We made necessary adjustments to the User Data script to cater for the CentOS environment (such as using chrony instead of ntp for time synchronization).
+- AMI Creation for Both Instances: After configuring the software on both the WordPress and Tooling EC2 instances, we created AMIs from both instances. These AMIs will serve as the base for future deployments.
+
+***Challenges Faced:***
+
+1. Accessing Instances in Private Subnets:
+
+**- Challenge #1:** Private Subnet Instances Lack Direct Internet Access
+Since the instances were placed in private subnets, they didn't have public IPs and thus couldn't be accessed directly from the internet.
+**Solution:** We had to set up a Bastion Host in a public subnet to act as a bridge for SSH access to the instances in private subnets.
+
+**- Challenge #2:** SSH Key Issues
+Initially, there were problems with accessing the private instances via SSH because the key pair wasn't properly set up on the Bastion Host.
+**- Solution:** We made sure that the private key (.pem file) was correctly placed in the ~/.ssh/ directory on the Bastion Host, with the proper permissions (chmod 400).
+
+**- Challenge #3:** Incorrect IP/Connection Errors
+There were connection errors when attempting to SSH into the private instances from the Bastion Host, due to incorrect key paths or permissions.
+**- Solution:** Ensured the correct use of the key when SSH’ing through the Bastion Host, using the command:
+```
+ssh -i ~/.ssh/Webserverkey.pem ec2-user@<private-instance-ip>
+```
+
+***Verification of Installation:***
+1. We verified the installation of all required packages on both the WordPress and Tooling EC2 instances using commands like:
+python --version
+yum list installed
+php -v
+systemctl status httpd
+Troubleshooting Errors:
+
+2. We faced issues where certain packages (e.g., htop, php, mariadb) were either not installed correctly or caused issues with service startup. These errors were addressed by:
+Clearing package cache with yum clean all.
+Re-running the installation commands.
+Checking for space availability, as mariadb installation issues were suspected to be related to disk space.
+Moving Forward:
+
+
+## All these steps has been repeated multiple times throughtout the course of this project. By now, you should have known how to:
+1. Create an AMI.
+2. Launch an instance from an AMI.
+3. Create an autoscaling group.
+4. Launch an instance from a launch template and adding a user data using shebang.
+5. Create a Load Balancer.
+6. Understand how Private and Public instances works.
+7. Get a better knowledge of bastion hosts etc.
 
 
 
