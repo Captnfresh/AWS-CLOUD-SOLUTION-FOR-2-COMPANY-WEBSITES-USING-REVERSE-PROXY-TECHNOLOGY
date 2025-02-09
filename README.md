@@ -1126,11 +1126,21 @@ Step 4: Verify Health Check
 Once everything is set up, the Auto Scaling Group will manage your Bastion instances automatically based on the load!
 
 ## Setup Compute resources for Webservers
+Now, you will need to create 2 separate launch templates for both the WordPress and Tooling websites
 
-
-
-
-
+1. Create an EC2 Instance (Centos) each for WordPress and Tooling websites per Availability Zone (in the same Region).
+2. Ensure that it has the following software installed
+   - python
+   - ntp
+   - net-tools
+   - vim
+   - wget
+   - telnet
+   - epel-release
+   - htop
+   - php
+  
+3. Create an AMI out of the Ec2 instance.
 
 
 
