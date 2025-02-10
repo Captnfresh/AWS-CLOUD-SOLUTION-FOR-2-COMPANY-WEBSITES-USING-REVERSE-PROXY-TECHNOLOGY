@@ -1208,24 +1208,274 @@ Moving Forward:
 7. Get a better knowledge of bastion hosts etc.
 
 
+## Deploy an internal ALB for both webservers(wordpress and tooling server)
+
+**Step 1: Create an Internal Application Load Balancer (ALB)**
+1. Go to AWS Console → EC2
+2. In the left menu, click Load Balancers
+3. Click Create Load Balancer
+4. Choose Application Load Balancer (ALB)
+5. Set Load Balancer Name (e.g., internal-alb)
+6. Under Scheme, select Internal
+7. Under IP Address Type, choose IPv4
+8. Under VPC, select your existing VPC
+9. Under Availability Zones, select the Private Subnets where your Web Servers are deployed(Private subnet 1&2 in this case)
+10. Click Next: Configure Security Settings
+
+Since the webservers are configured for auto-scaling, there is going to be a problem if servers get dynamically scalled out or in. Nginx will not know about the new IP addresses, or the ones that get removed. Hence, Nginx will not know where to direct the traffic.
+
+To solve this problem, we must use a load balancer. But this time, it will be an internal load balancer. Not Internet facing since the webservers are within a private subnet, and we do not want direct access to them.
+
+![image](https://github.com/user-attachments/assets/29786c75-97bc-410d-9f54-befdd3692496)
+
+![image](https://github.com/user-attachments/assets/b1b64b38-cd6a-4f6b-a978-8199c3254bb3)
+
+### NOTE: This process must be repeated for both WordPress and Tooling websites.
+
+## Create an Amazon Elastic File System.
+
+***Here is a step-by-step guide to setting up Amazon Elastic File System (EFS) and mounting it on both Nginx and Webservers to store data.***
+
+---
+
+### **1. Create an Amazon EFS Filesystem**
+
+**Steps**:
+1. **Log into AWS Management Console** and go to the **EFS** service.
+
+![image](https://github.com/user-attachments/assets/960e6cb6-b71f-444e-833a-c152b7391764)
+
+2. Click on **Create file system**.
+
+3. **Configure the file system settings**:
+   - Choose the **VPC** where your web servers are located.
+   - Leave the **performance mode** and **throughput mode** at the default values unless your workload requires specific settings.
+   - Select **One zone** or **General purpose** as needed.
+4. Click on **Create** to create the EFS filesystem.
+
+![image](https://github.com/user-attachments/assets/4f1fb377-d1b9-4125-8e7f-8742a92d5a92)
+
+![image](https://github.com/user-attachments/assets/e68efebf-0b7d-4a24-b477-dded481403ea)
+
+---
+
+### **2. Create an EFS Mount Target per Availability Zone (AZ)**
+
+**Steps**:
+1. After the EFS filesystem is created, go to the **File Systems** page in the EFS Console.
+2. Click on the filesystem you just created.
+3. Under **Network**, select the **Mount Targets** tab.
+4. Click **Add mount target**.
+5. For each Availability Zone (AZ) in your VPC, perform the following:
+   - **VPC Subnet**: Choose the subnet associated with your private web servers.
+   - **Security group**: Associate the security group created for the data layer.
+6. Click **Create**.
+
+Repeat these steps for each subnet in your VPC to ensure a mount target is available in each Availability Zone.
+
+![image](https://github.com/user-attachments/assets/26f9b764-ce73-4457-8550-62bd51e2d076)
+
+---
+
+### **3. Associate Security Groups for Data Layer**
+
+When you create mount targets, ensure that the **Security Group** for your data layer is selected. This security group should allow inbound traffic on **NFS port (2049)** so the web servers can access the EFS filesystem.
+
+**Steps**:
+1. Go to **VPC** in the AWS Console.
+2. Under **Security Groups**, create a security group for the data layer if you haven’t already.
+3. Add a **rule** to allow inbound traffic on port **2049** for **NFS**.
+4. Attach this security group to the mount targets created for the EFS filesystem.
+
+---
+
+### **4. Create an EFS Access Point**
+
+**Steps**:
+1. In the **EFS Console**, select your filesystem.
+2. Under the **Access points** tab, click on **Create access point**.
+3. Provide a **name** for the access point. You can leave all other settings at their default values.
+4. Select **Create**.
+
+---
+
+### **5. Mount EFS on Nginx and Webservers**
+
+**On Nginx Server:**
+1. SSH into the Nginx instance.
+2. Install the **NFS client** package if it is not already installed:
+   ```
+   sudo yum install -y nfs-utils
+   ```
+3. Create a directory to mount the EFS filesystem:
+   ```
+   sudo mkdir /mnt/efs
+   ```
+4. Mount the EFS filesystem using the **mount target DNS** of the appropriate AZ (you can get this DNS from the EFS console):
+   ```
+   sudo mount -t nfs4 <EFS_MOUNT_TARGET_DNS>:/ /mnt/efs
+   ```
+5. To mount EFS automatically after reboot, add it to the **/etc/fstab** file:
+   ```
+   echo "<EFS_MOUNT_TARGET_DNS>:/ /mnt/efs nfs4 defaults,_netdev 0 0" | sudo tee -a /etc/fstab
+   ```
+
+**On Web Server:**
+1. SSH into the Web server instance.
+2. Install the **NFS client** package if it’s not installed:
+   ```
+   sudo yum install -y nfs-utils
+   ```
+3. Create a directory to mount the EFS filesystem:
+   ```
+   sudo mkdir /mnt/efs
+   ```
+4. Mount the EFS filesystem similarly:
+   ```
+   sudo mount -t nfs4 <EFS_MOUNT_TARGET_DNS>:/ /mnt/efs
+   ```
+5. Edit **/etc/fstab** to auto-mount after reboot:
+   ```
+   echo "<EFS_MOUNT_TARGET_DNS>:/ /mnt/efs nfs4 defaults,_netdev 0 0" | sudo tee -a /etc/fstab
+   ```
+
+---
+
+### **6. Verify EFS Mounting**
+
+After mounting the EFS filesystem on both web servers:
+
+1. **Check the mount**:
+   ```
+   df -h
+   ```
+   You should see the EFS filesystem mounted at `/mnt/efs`.
+
+2. **Test File Access**:
+   - On both the Nginx and Web servers, create a file to test if it’s shared across instances:
+     ```
+     sudo touch /mnt/efs/testfile.txt
+     ```
+   - Check if the file is visible from both the Nginx and Web servers.
+
+---
+
+### **Conclusion**
+
+By following these steps, you have:
+- Created an EFS filesystem.
+- Set up mount targets for each Availability Zone.
+- Associated appropriate security groups to allow NFS traffic.
+- Created an EFS access point for simplified access management.
+- Mounted the EFS filesystem on both the Nginx and Web servers.
+
+The EFS is now successfully integrated into your architecture, providing shared storage for your web servers.
 
 
 
 
 
+### **Amazon RDS Setup for MySQL**
 
+In this guide, we will walk through the setup of an **Amazon Relational Database Service (RDS)** MySQL instance with Multi-AZ support to ensure high availability and failover protection. We will also include encryption using **KMS (Key Management Service)** for security. This setup will be done on two availability zones (AZs), with the potential to scale to three AZs as needed.
 
+---
 
+### **Prerequisite: Create a KMS Key for Encryption**
+Before setting up your RDS database, you must create a KMS key to encrypt the database instance.
 
+**Steps**:
+1. Go to the **KMS Console** in AWS.
+2. Select **Create Key**.
+3. Choose **Symmetric Key** and click **Next**.
+4. Enter a key name and description (e.g., `RDS-Encryption-Key`).
+5. Set the **Key Administrative Permissions** (you can assign administrative users who will manage the key).
+6. Set the **Key Usage Permissions** to allow the necessary users and roles to use the key.
+7. Finish the creation and ensure you take note of the **Key ARN** (Amazon Resource Name) for later use during RDS instance creation.
 
+---
 
+### **1. Create a Subnet Group for RDS**
 
+A **DB Subnet Group** is needed to specify which subnets Amazon RDS can use to deploy the database instance. You should use private subnets in your data layer for security.
 
+**Steps**:
+1. In the **RDS Console**, go to the **Subnet Groups** section.
+2. Click **Create DB Subnet Group**.
+3. Provide a **name** for the subnet group (e.g., `my-rds-subnet-group`).
+4. Choose your **VPC** and select at least two **private subnets** in different availability zones for high availability.
+5. Save the subnet group.
 
+---
 
+### **2. Create an RDS MySQL Instance**
 
+**Steps**:
+1. Go to the **RDS Console** and click on **Create database**.
+2. Select **Standard Create**.
+3. Choose **MySQL** as the engine type and select **MySQL 8.x.x**.
+4. Under **Version**, select the desired version (e.g., **8.x**).
+5. Select **Do not create a standby instance** under **Availability & Durability** to minimize costs for test environments (if you want multi-AZ for production, select **Create a standby instance**).
+6. Under **Settings**:
+   - Provide a **DB instance identifier** (e.g., `my-rds-instance`).
+   - Enter the **Master username** (e.g., `admin`).
+   - Provide the **Master password** and confirm it.
+7. For **DB Instance Size**:
+   - Select the instance class based on your requirements (e.g., `db.t3.micro` for testing purposes).
+   - Set the **Allocated Storage** (e.g., 20 GB for testing purposes).
+8. **VPC & Subnet**:
+   - Ensure the **VPC** selected is the same as the one you created the subnet group in.
+   - Select the **DB Subnet Group** created earlier.
+9. **VPC Security Groups**:
+   - Select the appropriate **security group** for the RDS instance to ensure it is not accessible from the internet. This should only allow connections from your web and application servers.
+10. **Backup**:
+    - Set the **Backup Retention Period** (e.g., 7 days).
+    - Enable **Automated backups** for better data protection.
+11. **Encryption**:
+    - Enable **Encryption** using the KMS key created earlier.
+    - Select the **KMS Key** that you created for encryption.
+12. **Monitoring**:
+    - Enable **Enhanced Monitoring** to get insights into DB instance performance.
+    - Enable **CloudWatch Logs Export** for **Error Logs** and **Slow Query Logs**.
+13. After reviewing the configuration, click **Create database**.
 
+---
 
+### **3. Final Configuration & Security**
+
+Once your RDS instance is created, ensure the following configurations are in place for security and operational efficiency:
+
+- **VPC Security**:
+  - Ensure that your RDS instance is located in private subnets to restrict internet access.
+  - Update your **Security Groups** to allow traffic only from the web and application servers that need to access the RDS instance.
+  
+- **Backup & Retention**:
+  - The backup policy you configured will automatically create snapshots of your RDS instance on a regular basis.
+  - Review the **backup retention period** to make sure it meets your requirements.
+
+- **CloudWatch Monitoring**:
+  - Ensure that **CloudWatch Monitoring** is enabled for metrics like CPU utilization, memory usage, and I/O operations.
+  - Additionally, **Error Logs** and **Slow Query Logs** are exported for monitoring and troubleshooting.
+
+---
+
+### **4. Review Costs and Decommissioning**
+
+- **Cost Considerations**:
+  - Amazon RDS is a managed service, but it can incur significant costs depending on the instance type, storage size, and the additional features you enable.
+  - Always monitor your monthly usage and costs in the **AWS Billing Dashboard** to ensure that you're not exceeding your budget.
+  - **Do not leave services running for long periods** if they are not needed, especially in a test environment.
+
+- **Decommissioning**:
+  - Once the RDS instance is no longer needed, ensure to **delete the instance** and associated resources like automated backups and snapshots to prevent ongoing charges.
+
+---
+
+### **Conclusion**
+
+This setup provides a **highly available MySQL database** running on **Amazon RDS** with **encryption** and **CloudWatch monitoring**. The **multi-AZ** configuration ensures that the database is resilient to failures of a single Availability Zone, and the use of **KMS** ensures data security.
+
+With these steps, you are now equipped with a fully managed, scalable, and secure database for your application workloads.
 
 
 
