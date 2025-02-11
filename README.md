@@ -1294,8 +1294,14 @@ When you create mount targets, ensure that the **Security Group** for your data 
 **Steps**:
 1. In the **EFS Console**, select your filesystem.
 2. Under the **Access points** tab, click on **Create access point**.
+
+![image](https://github.com/user-attachments/assets/a8731b37-aafb-430d-a54f-fbb692945548)
+
+
 3. Provide a **name** for the access point. You can leave all other settings at their default values.
 4. Select **Create**.
+
+![image](https://github.com/user-attachments/assets/44dfddd9-f39f-4118-aa1b-00e83b85e5ec)
 
 ---
 
@@ -1307,6 +1313,8 @@ When you create mount targets, ensure that the **Security Group** for your data 
    ```
    sudo yum install -y nfs-utils
    ```
+   ![image](https://github.com/user-attachments/assets/8c5d1091-1c12-4329-a64e-fc7e67d0cfd7)
+
 3. Create a directory to mount the EFS filesystem:
    ```
    sudo mkdir /mnt/efs
@@ -1477,7 +1485,96 @@ This setup provides a **highly available MySQL database** running on **Amazon RD
 
 With these steps, you are now equipped with a fully managed, scalable, and secure database for your application workloads.
 
+### **Configuring DNS with Route 53 for WordPress and Tooling Website**
 
+In this phase, we ensure that the WordPress **main domain** and the **subdomain for the Tooling website** are correctly configured in **Amazon Route 53** for proper accessibility.
+
+---
+
+## **1. Create Required DNS Records in Route 53**
+You previously registered a **free domain** with **Freenom** and created a **hosted zone** in **Route 53**. Now, you'll create additional **DNS records** to correctly route traffic.
+
+### **a. Create an Alias Record for the Root Domain**
+This step ensures that your **WordPress website** is accessible via your main domain.
+
+1. **Go to AWS Route 53**
+2. **Select the hosted zone** associated with your domain.
+3. **Click "Create Record".**
+4. **Choose Record Name:** Leave it blank (this applies to the root domain, e.g., `yourdomain.com`).
+5. **Select Record Type:** `A – IPv4 address`
+6. **Alias:** **Yes**
+7. **Route traffic to:** Select **"Alias to Application Load Balancer"** and choose the **ALB DNS name**.
+8. **Click Create Record.**
+
+✅ This will route traffic from `yourdomain.com` to the **Application Load Balancer (ALB)**.
+
+---
+
+### **b. Create an Alias Record for the Tooling Website Subdomain**
+This step ensures that `tooling.yourdomain.com` correctly routes traffic.
+
+1. **Go back to Route 53 Hosted Zone.**
+2. **Click "Create Record".**
+3. **Enter Record Name:** `tooling` (this applies to `tooling.yourdomain.com`).
+4. **Select Record Type:** `A – IPv4 address`
+5. **Alias:** **Yes**
+6. **Route traffic to:** Select **"Alias to Application Load Balancer"** and choose the **ALB DNS name**.
+7. **Click Create Record.**
+
+✅ This will route traffic from `tooling.yourdomain.com` to the **Application Load Balancer (ALB)**.
+
+---
+
+## **2. Alternative Option: Use a CNAME Record Instead**
+Instead of an **alias record**, you can use a **CNAME record** to achieve similar results.
+
+- If you choose **CNAME**, follow the same steps, but select `CNAME` as the record type and point it to the **ALB DNS name** instead.
+
+💡 **Key Differences:**
+- **Alias Record**: Faster and can point to AWS resources like ALBs, S3 buckets, and CloudFront.
+- **CNAME Record**: Works for domain-to-domain mapping but **cannot be used for root domains** (only subdomains).
+
+---
+
+## **3. Verify DNS Propagation**
+Once you've created the records, test whether your DNS configurations have propagated correctly:
+
+- Use **nslookup** or **dig** to check the DNS resolution:
+  ```bash
+  nslookup yourdomain.com
+  nslookup tooling.yourdomain.com
+  ```
+  Or:
+  ```bash
+  dig yourdomain.com
+  dig tooling.yourdomain.com
+  ```
+
+- If it returns the **ALB DNS name**, your setup is successful.
+- If not, wait **a few minutes to hours** for propagation.
+
+---
+
+## **4. Confirm Website Accessibility**
+- Open a web browser and visit:
+  - `http://yourdomain.com`
+  - `http://tooling.yourdomain.com`
+- Both should resolve to your ALB, correctly loading the WordPress and Tooling websites.
+
+---
+
+## **5. (Optional) Enable HTTPS with an SSL Certificate**
+To secure your websites, you can use **AWS Certificate Manager (ACM)** to issue an **SSL certificate** and enable HTTPS via **ALB**.
+
+---
+
+### **Final Checklist**
+✅ **Alias record for root domain (`yourdomain.com`) pointing to ALB**  
+✅ **Alias record for subdomain (`tooling.yourdomain.com`) pointing to ALB**  
+✅ **DNS records verified using `nslookup` or `dig`**  
+✅ **Website loads correctly in a browser**
+
+This completes your **Route 53 DNS setup**! 🚀
 
 
 
