@@ -1447,6 +1447,15 @@ A **DB Subnet Group** is needed to specify which subnets Amazon RDS can use to d
     - Enable **CloudWatch Logs Export** for **Error Logs** and **Slow Query Logs**.
 13. After reviewing the configuration, click **Create database**.
 
+![image](https://github.com/user-attachments/assets/6f541aad-5bd3-430d-9d80-e876d8d623af)
+
+![image](https://github.com/user-attachments/assets/8ad029a6-80fa-41ee-9c2a-17f0a3c1f740)
+
+![image](https://github.com/user-attachments/assets/2fe8862c-fb92-48b1-b451-04975078628a)
+
+![image](https://github.com/user-attachments/assets/78e129dd-3892-42c2-98f7-1168334d2c6c)
+
+
 ---
 
 ### **3. Final Configuration & Security**
@@ -1577,11 +1586,15 @@ To secure your websites, you can use **AWS Certificate Manager (ACM)** to issue 
 This completes your **Route 53 DNS setup**! 🚀
 
 
+![image](https://github.com/user-attachments/assets/6bc5883b-cb7b-41c8-ba1b-0359c5d5691b)
+
+![image](https://github.com/user-attachments/assets/96ef806a-878b-4301-85e4-49804155f2e2)
+
+![image](https://github.com/user-attachments/assets/0a028207-5e66-4e0c-9f23-c4242923b30b)
 
 
-
-
-
+## The end of Project 15
+In this project We have just created a secured, scalable and cost-effective infrastructure to host 2 enterprise websites using various Cloud services from AWS. At this point, your infrastructure is ready to host real websites’ load. Since it is a pretty expensive infrastructure to keep it up and running, we are going to start using Infrastructure as Code tool Terraform to easily provision and destroy this set up.
 
 
 
